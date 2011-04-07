@@ -13,6 +13,6 @@ Basic Features (initial brainstorm)
 
 The current plan
 ================
-* Site cron runs seem to be a reasonable place to check this. -hook_post_hosting_TASK_TYPE_task looks like a good hook candidate. So, define a hosting_trial_post_hosting_cron_task().- Nope, cron isn't that kind of task... I'm strating to think I'll need to implement my own queue for this... Which I guess makes sense.
+* Site cron runs seem to be a reasonable place to check this. <del>hook_post_hosting_TASK_TYPE_task looks like a good hook candidate. So, define a hosting_trial_post_hosting_cron_task().</del> Nope, cron isn't that kind of task... I'm strating to think I'll need to implement my own queue for this... Which I guess makes sense.
 * A tab is needed on platforms to allow default values to be set (should this be set per profile?)
 * A field on the site is then set accordingly, and can be overridden manually
