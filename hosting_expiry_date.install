@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Define database table(s) to track site expiry dates
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function hosting_expiry_date_install() {
+  drupal_install_schema('hosting_expiry_date');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function hosting_expiry_date_uninstall() {
+  drupal_uninstall_schema('hosting_expiry_date');
+}
+
+/**
+ * Implementation of hook_schema().
+ */
+function hosting_expiry_date_schema() {
+  $schema['hosting_expiry_date_date'] = array(
+    'description' => t('Stores site expiry date information.'),
+    'fields' => array(
+      'site_nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t('The site\'s {node}.nid.'),
+      ),
+      'expiry_date' => array(
+        'type' => 'datetime',
+        'not null' => TRUE,
+        'description' => t('The site\'s expiry date.'),
+      ),
+    ),
+  );
+
+  return $schema;
+}

@@ -1,6 +1,6 @@
 core = "6.x"
 
 description = "Allows for sites to be disabled after a set time."
-name = "Hosting Expiry Date"
+name = "Expiry Date"
 package = "Hosting"
 project = "hosting_expiry_date"
