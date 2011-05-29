@@ -18,7 +18,7 @@ function hosting_expiry_date_menu() {
     'title' => t('Expiry dates'),
     'description' => t('Site expiry date(s)'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('hosting_expiry_date_form', 1),
+    'page arguments' => array('hosting_expiry_date_site_form', 1),
     'type' => MENU_LOCAL_TASK,
     'access arguments' => array('set site expiry dates'),
     'weight' => 1,
@@ -47,7 +47,7 @@ function hosting_expiry_date_node_load($arg) {
  * @param $nid
  *   Node ID of the site
  */
-function hosting_expiry_date_form($form_state, $nid) {
+function hosting_expiry_date_site_form($form_state, $nid) {
   drupal_set_title(t('Expiry Dates for') . ' ' . node_load($nid)->title);
   $form = array();
   $form['intro'] = array(
@@ -59,12 +59,12 @@ function hosting_expiry_date_form($form_state, $nid) {
     '#title' => 'Disable site',
   );
 
-  $form['Disable']['active'] = array(
+  $form['Disable']['disable_active'] = array(
     '#type' => 'checkbox',
     '#title' => 'Automatically disable this site?',
   );
 
-  $form['Disable'][' date'] = array(
+  $form['Disable']['disable_date'] = array(
     '#type' => 'date',
     '#title' => 'Disable date',
     '#default_value' => array(
@@ -78,12 +78,12 @@ function hosting_expiry_date_form($form_state, $nid) {
     '#title' => 'Delete site',
   );
 
-  $form['Delete']['active'] = array(
+  $form['Delete']['delete_active'] = array(
     '#type' => 'checkbox',
     '#title' => 'Automatically delete this site?',
   );
 
-  $form['Delete']['date'] = array(
+  $form['Delete']['delete_date'] = array(
     '#type' => 'date',
     '#title' => 'Delete date',
     '#default_value' => array(
@@ -98,3 +98,22 @@ function hosting_expiry_date_form($form_state, $nid) {
   );
   return $form;
 }
+
+/**
+ * Validate our form.
+ */
+function hosting_expiry_date_site_form_validate($form, &$form_state) {
+  // TODO: find a better way to do this
+  $disable_date = mktime(0, 0, 0, $form_state['values']['disable_date']['month'], $form_state['values']['disable_date']['day'], $form_state['values']['disable_date']['year']);
+  $delete_date = mktime(0, 0, 0, $form_state['values']['delete_date']['month'], $form_state['values']['delete_date']['day'], $form_state['values']['delete_date']['year']);
+  $today = time();
+
+  // ensure that expiry dates are in the future
+  if ($disable_date < $today) {
+    form_set_error($form['Disable']['disable_date'], '<em>' . $form['Disable']['disable_date']['#title'] .'</em>' . t(' must be set to a future date.'));
+  }
+  if ($delete_date < $today) {
+    form_set_error($form['Delete']['delete_date'], '<em>' . $form['Delete']['delete_date']['#title'] . '</em>' . t(' must be set to a future date.'));
+  }
+}
+
