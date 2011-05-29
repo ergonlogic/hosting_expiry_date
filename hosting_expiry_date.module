@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implementation of hook_perm().
+ */
+function hosting_expiry_date_perm() {
+  $perms = array(
+    'set site expiry dates');
+  return $perms;
+}
+
