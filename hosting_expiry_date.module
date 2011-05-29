@@ -54,14 +54,42 @@ function hosting_expiry_date_form($form_state, $nid) {
     '#value' => 'Set expiry dates for this site. The site sill be disabled or deleted on these dates.',
   );
  
-  $form['Disable date'] = array(
-    '#type' => 'date',
-    '#title' => 'Disable date',
+  $form['Disable'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Disable site',
   );
 
-  $form['Delete date'] = array(
+  $form['Disable']['active'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Automatically disable this site?',
+  );
+
+  $form['Disable'][' date'] = array(
+    '#type' => 'date',
+    '#title' => 'Disable date',
+    '#default_value' => array(
+      'year' => 2007,
+      'month' => 2,
+      'day' => 15)
+  );
+
+  $form['Delete'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Delete site',
+  );
+
+  $form['Delete']['active'] = array(
+    '#type' => 'checkbox',
+    '#title' => 'Automatically delete this site?',
+  );
+
+  $form['Delete']['date'] = array(
     '#type' => 'date',
     '#title' => 'Delete date',
+    '#default_value' => array(
+      'year' => 2007, 
+      'month' => 2, 
+      'day' => 15)
   );
 
   $form['submit'] = array(
