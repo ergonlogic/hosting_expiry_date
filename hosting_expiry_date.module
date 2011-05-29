@@ -9,3 +9,64 @@ function hosting_expiry_date_perm() {
   return $perms;
 }
 
+/**
+ * Implementation of hook_menu().
+ */
+function hosting_expiry_date_menu() {
+  $items = array();
+  $items['node/%hosting_expiry_date_node/expiry'] = array(
+    'title' => t('Expiry dates'),
+    'description' => t('Site expiry date(s)'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('hosting_expiry_date_form', 1),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('set site expiry dates'),
+    'weight' => 1,
+  );
+  return $items;
+}
+
+/**
+ * Wildcard loader function to limit the expiry dates tab to just site nodes
+ */
+function hosting_expiry_date_node_load($arg) {
+  if (!is_numeric($arg)) {
+    return FALSE;
+  }
+  if ($node = node_load($arg)) {
+    if (in_array($node->type, array('site'))) {
+      return $arg;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Form where we collect expiry dates for sites
+ *
+ * @param $nid
+ *   Node ID of the site
+ */
+function hosting_expiry_date_form($form_state, $nid) {
+  drupal_set_title(t('Expiry Dates for') . ' ' . node_load($nid)->title);
+  $form = array();
+  $form['intro'] = array(
+    '#value' => 'Set expiry dates for this site. The site sill be disabled or deleted on these dates.',
+  );
+ 
+  $form['Disable date'] = array(
+    '#type' => 'date',
+    '#title' => 'Disable date',
+  );
+
+  $form['Delete date'] = array(
+    '#type' => 'date',
+    '#title' => 'Delete date',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
