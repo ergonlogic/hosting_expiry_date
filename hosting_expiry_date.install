@@ -23,7 +23,7 @@ function hosting_expiry_date_uninstall() {
  * Implementation of hook_schema().
  */
 function hosting_expiry_date_schema() {
-  $schema['hosting_expiry_date_date'] = array(
+  $schema['hosting_expiry_date_dates'] = array(
     'description' => t('Stores site expiry date information.'),
     'fields' => array(
       'site_nid' => array(
@@ -36,6 +36,12 @@ function hosting_expiry_date_schema() {
         'type' => 'datetime',
         'not null' => TRUE,
         'description' => t('The site\'s expiry date.'),
+      ),
+      'action' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => t('The action to take on site expiry (disable or delete).'),
+
       ),
     ),
   );
