@@ -51,45 +51,41 @@ function hosting_expiry_date_site_form($form_state, $nid) {
   drupal_set_title(t('Expiry Dates for') . ' ' . node_load($nid)->title);
   $form = array();
   $form['intro'] = array(
-    '#value' => 'Set expiry dates for this site. The site sill be disabled or deleted on these dates.',
+    '#value' => t('Set expiry dates for this site. The site sill be disabled or deleted on these dates.'),
   );
  
   $form['Disable'] = array(
     '#type' => 'fieldset',
-    '#title' => 'Disable site',
+    '#title' => t('Disable site'),
   );
 
   $form['Disable']['disable_active'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Automatically disable this site?',
+    '#title' => t('Automatically disable this site?'),
+    '#default_value' => (bool) hosting_expiry_date_lookup($nid, 'disable'),
   );
 
   $form['Disable']['disable_date'] = array(
     '#type' => 'date',
-    '#title' => 'Disable date',
-    '#default_value' => array(
-      'year' => 2007,
-      'month' => 2,
-      'day' => 15)
+    '#title' => t('Disable date'),
+    '#default_value' => hosting_expiry_date_default($nid, 'disable', '30'),
   );
 
   $form['Delete'] = array(
     '#type' => 'fieldset',
-    '#title' => 'Delete site',
+    '#title' => t('Delete site'),
   );
 
   $form['Delete']['delete_active'] = array(
     '#type' => 'checkbox',
-    '#title' => 'Automatically delete this site?',
+    '#title' => t('Automatically delete this site?'),
+    '#default_value' => (bool) hosting_expiry_date_lookup($nid, 'delete'),
   );
 
   $form['Delete']['delete_date'] = array(
     '#type' => 'date',
-    '#title' => 'Delete date',
-    '#default_value' => array(
-      'year' => 2007, 
-      'month' => 2, 
-      'day' => 15)
+    '#title' => t('Delete date'),
+    '#default_value' => hosting_expiry_date_default($nid, 'delete', '30'),
   );
 
   $form['submit'] = array(
@@ -115,7 +111,6 @@ function hosting_expiry_date_site_form_validate($form, &$form_state) {
   if ($delete_date < $today && $form_state['values']['delete_active'] != '0') {
     form_set_error($form['Delete']['delete_date'], '<em>' . $form['Delete']['delete_date']['#title'] . '</em>' . t(' must be set to a future date.'));
   }
-  dsm($form_state);
 }
 
 /**
@@ -135,3 +130,52 @@ function hosting_expiry_date_site_form_submit($form, &$form_state) {
     db_query('INSERT INTO {hosting_expiry_date_dates} (site_nid, expiry_date, action) VALUES (%d, "%s", "delete")', $nid, $delete_date->format('Y-m-d H:i:s'));
     }
 }
+
+/**
+ * Get the expiry date for a given node
+ *
+ * @param $nid
+ *   Node ID of the site
+ * @param $action
+ *   'disable' or 'delete'
+ *
+ * @return
+ *   If set, the expiry date set for $action. Otherwise, FALSE.
+ */
+function hosting_expiry_date_lookup($nid, $action) {
+  $date = db_result(db_query('SELECT expiry_date FROM {hosting_expiry_date_dates} WHERE site_nid = %d AND action = "%s"',$nid, $action));
+  if (!empty($date)) {
+    return $date;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Format an expiry date for display in a form
+ *
+ * @param $nid
+ *   Node ID of the site
+ * @param $action
+ *   'disable' or 'delete'
+ * @param $offset
+ *   The number of day in the future to set the default date
+ *
+ * @return
+ *   If set, the expiry date set for $action, as an array. Otherwise, today's
+ *   date + $offset, as an array.
+ */
+function hosting_expiry_date_default($nid, $action, $offset = '0') {
+  $date = date_create_from_format('Y-m-d H:i:s', hosting_expiry_date_lookup($nid, $action));
+  if (empty($date)) {
+    $today = new DateTime();
+    $date = date_modify($today, '+' . $offset . ' days');
+  }
+  return array(
+    'year' => $date->format('Y'),
+    'month' => $date->format('n'), //no leading zeros
+    'day' => $date->format('d'),
+  );
+}
+
